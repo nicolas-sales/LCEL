@@ -48,6 +48,26 @@ add_routes(
     path="/chain"
 )
 
+# La fonction add_route():
+
+# enregistre des routes FastAPI
+
+# ajoute automatiquement :
+
+ #/chain/invoke
+
+# /chain/batch
+
+# /chain/stream
+
+# /chain/stream_log
+
+# /chain/playground
+
+# initialise le système LangServe
+
+# affiche son nom au démarrage
+
 
 if __name__=="__main__":
     import uvicorn
