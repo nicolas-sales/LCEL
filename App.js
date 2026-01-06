@@ -3,81 +3,39 @@ import { useState } from "react";
 
 function App() {
 
+  // Je crée une variable question (le texte tapé)
+  // et une fonction setQuestion pour la modifier
   const [question, setQuestion] = useState("");  
+
+  // Je crée une variable réponse
+  // et une fonction setAnswer pour la modifier
   const [answer, setAnswer] = useState("");  
+
+  // Je crée une variable language
+  // et une fonction setLanguage pour la modifier
   const [language, setLanguage] = useState("fr");  
-  const [listening, setListening] = useState(false);
 
-  // 🎙️ Speech-to-Text
-  const startListening = () => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    if (!SpeechRecognition) {
-      alert("Speech-to-Text non supporté par ce navigateur");
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-
-    recognition.lang =
-      language === "fr" ? "fr-FR" :
-      language === "en" ? "en-US" :
-      "es-ES";
-
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognition.onstart = () => setListening(true);
-    recognition.onend = () => setListening(false);
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setQuestion(transcript); // Remplit le textarea
-    };
-
-    recognition.start();
-  };
-
-  // 🔊 Text-to-Speech
-  const speak = (text) => {
-    if (!window.speechSynthesis) {
-      alert("Text-to-Speech non supporté par ce navigateur");
-      return;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(text);
-
-    utterance.lang =
-      language === "fr" ? "fr-FR" :
-      language === "en" ? "en-US" :
-      "es-ES";
-
-    utterance.rate = 1;
-    utterance.pitch = 1;
-
-    window.speechSynthesis.speak(utterance);
-  };
-
-  // 📡 Envoi au backend
+  // Quand j’appelle cette fonction, j’envoie la question à l’API
   const sendQuestion = async () => {
-    if (!question.trim()) return;
-
     const response = await fetch("http://localhost:8000/chain/invoke", {
+      // J’envoie une requête HTTP au backend
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         input: {
-          language: language,
-          text: question
+          language: language,   // Langue choisie par l’utilisateur
+          text: question        // Texte tapé par l’utilisateur
         }
       }) 
     });
 
+    // Je récupère la réponse et je la mets dans answer
     const data = await response.json();  
     setAnswer(data.output);
   };
 
+  // Tout ce qu’il y a ici est affiché dans le navigateur
   return (
     <div style={styles.page}>
       <div style={styles.card}>
@@ -94,24 +52,14 @@ function App() {
           <option value="es">Espagnol</option>
         </select>
 
-        <label style={styles.label}>Texte (écrit ou dicté)</label>
+        <label style={styles.label}>Texte</label>
         <textarea
           rows="4"
           style={styles.textarea}
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Écris ou parle ton texte..."
+          placeholder="Écris ton texte ici..."
         />
-
-        <button
-          style={{
-            ...styles.button,
-            backgroundColor: listening ? "#dc2626" : "#16a34a"
-          }}
-          onClick={startListening}
-        >
-          {listening ? "🎙️ Écoute en cours..." : "🎙️ Parler"}
-        </button>
 
         <button style={styles.button} onClick={sendQuestion}>
           Traduire
@@ -121,13 +69,6 @@ function App() {
           <div style={styles.answerBox}>
             <strong>Traduction :</strong>
             <p>{answer}</p>
-
-            <button
-              style={styles.listenButton}
-              onClick={() => speak(answer)}
-            >
-              🔊 Lire la réponse
-            </button>
           </div>
         )}
       </div>
@@ -138,7 +79,7 @@ function App() {
 export default App;
 
 
-// 🎨 Styles
+// 🎨 Styles (EN DEHORS du composant)
 const styles = {
   page: {
     minHeight: "100vh",
@@ -176,7 +117,7 @@ const styles = {
   },
   button: {
     width: "100%",
-    marginTop: "15px",
+    marginTop: "20px",
     padding: "12px",
     backgroundColor: "#4f46e5",
     color: "white",
@@ -185,16 +126,6 @@ const styles = {
     cursor: "pointer",
     fontSize: "16px",
   },
-  listenButton: {
-    marginTop: "10px",
-    padding: "10px",
-    width: "100%",
-    backgroundColor: "#0ea5e9",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-  },
   answerBox: {
     marginTop: "20px",
     padding: "15px",
@@ -202,6 +133,5 @@ const styles = {
     borderRadius: "6px",
   },
 };
-
 
 

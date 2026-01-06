@@ -25,13 +25,14 @@ model=ChatGroq(model="llama-3.1-8b-instant",groq_api_key=groq_api_key)
 # Pormpt template
 
 systeme_template = (
-    "You are a translation engine. "
-    "Your task is to translate text. "
+    "You are a strict translation engine. "
+    "You MUST translate the text literally. "
+    "DO NOT answer the question. "
+    "DO NOT add information. "
+    "DO NOT change the meaning. "
     "Translate the user text into {language}. "
     "Return ONLY the translated text. "
-    "No explanations. No definitions. "
-    "No quotation marks. "
-    "One sentence only."
+    "No explanations. No quotation marks."
 )
 
 # systeme_template = "Translate the following into {language}:"
